@@ -9,6 +9,7 @@
 , mill
 , espresso
 , circt
+, jextract
 , protobuf
 , antlr4
 
@@ -44,6 +45,7 @@ let
       jq
       espresso
       circt
+      jextract
       protobuf
       antlr4
       makeWrapper
@@ -51,6 +53,8 @@ let
 
       submodules.setupHook
     ];
+
+    env.CIRCT_INSTALL_PATH = circt;
 
     buildPhase = ''
       mill -i 'elaborator.assembly'

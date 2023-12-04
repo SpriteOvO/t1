@@ -27,7 +27,7 @@ stdenvNoCC.mkDerivation {
     mkdir -p elaborate $out
     ${elaborator}/bin/elaborator --config "${elaborate-config}" --dir elaborate --tb ${lib.boolToString is-testbench}
 
-    firtool elaborate/*.fir --annotation-file elaborate/*.anno.json -o $out ${mfcArgs}
+    # firtool elaborate/*.fir --annotation-file elaborate/*.anno.json -o $out ${mfcArgs}
 
     # Fix file ordering difference introduced in some unknown breaking change between firtool 1.50 -> 1.58
     # In the previous working version, all files starting with './' should be placed on top of the filelist.f.

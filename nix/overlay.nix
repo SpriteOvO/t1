@@ -33,6 +33,29 @@ final: prev:
     });
   });
 
+  circt = prev.circt.overrideAttrs (old: {
+    installPhase = ''
+      runHook preInstall
+      mkdir -p $out
+      CMAKE_INSTALL_PREFIX=$out cmake --build . --target install --config Release
+      runHook postInstall
+    '';
+  });
+
+  jextract = prev.jextract.overrideAttrs (old: {
+    version = "unstable-2023-09-25";
+    src = final.fetchFromGitHub {
+      owner = "openjdk";
+      repo = "jextract";
+      rev = "a3c3644580a5144840de341e7c1cbf7dc4de3206"; # Tweak build for JDK 21
+      hash = "sha256-0Z8IskIF9GT3Y+Pah2G+TvCVGBK6++/1ctirv8ZsGBA=";
+    };
+    env = {
+      ORG_GRADLE_PROJECT_llvm_home = final.llvmPackages.libclang.lib;
+      ORG_GRADLE_PROJECT_jdk21_home = final.pkgs.jdk21;
+    };
+  });
+
   espresso = final.callPackage ./pkgs/espresso.nix { };
   libspike = final.callPackage ./pkgs/libspike.nix { };
   buddy-mlir = final.callPackage ./pkgs/buddy-mlir.nix { };

@@ -9,6 +9,7 @@ import mill.scalalib.scalafmt._
 import mill.scalalib.TestModule.Utest
 import coursier.maven.MavenRepository
 import $file.dependencies.chisel.build
+import $file.dependencies.chisel.common
 import $file.dependencies.arithmetic.common
 import $file.dependencies.tilelink.common
 import $file.dependencies.`berkeley-hardfloat`.common
@@ -118,9 +119,21 @@ trait Vector
   def hardfloatModule = hardfloat
 }
 
+object circtpanamabinder extends CIRCTPanamaBinder
+
+trait CIRCTPanamaBinder 
+  extends millbuild.dependencies.chisel.build.CIRCTPanamaBinder {
+  def crossValue = v.scala
+
+  override def millSourcePath = os.pwd / "dependencies" / "chisel" / "binder"
+
+  def scalaVersion = T(v.scala)
+}
+
 // Module to generate RTL from json config
 // TODO: remove testbench
-object elaborator extends ScalaModule with ScalafmtModule {
+object elaborator extends ScalaModule with ScalafmtModule with millbuild.dependencies.chisel.common.HasCIRCTPanamaBinderModule {
+  override def circtPanamaBinderModule = circtpanamabinder
   override def millSourcePath: os.Path = os.pwd / "elaborator"
   override def scalacPluginClasspath = T(Agg(chisel.pluginModule.jar()))
   override def scalacOptions = T(
@@ -129,7 +142,7 @@ object elaborator extends ScalaModule with ScalafmtModule {
     )
   )
   override def scalaVersion = v.scala
-  override def moduleDeps = Seq(vector)
+  override def moduleDeps = super.moduleDeps ++ Seq(vector)
   override def ivyDeps = T(Seq(v.mainargs))
 }
 
